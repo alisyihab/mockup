@@ -96,7 +96,9 @@ const ToastifyWrapper = styled(Box)<BoxProps>(({ theme }) => {
 })
 
 const AppReactToastify = (props: Props) => {
-  const { boxProps, direction = 'ltr', ...rest } = props
+  const { boxProps, direction = 'ltr', ...rest } = props;
+
+  type ToastPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
 
   const positionMap: Partial<Record<ToastPosition, ToastPosition>> = {
     'top-right': 'top-left',
@@ -105,15 +107,17 @@ const AppReactToastify = (props: Props) => {
     'bottom-right': 'bottom-left',
     'top-center': 'top-center',
     'bottom-center': 'bottom-center'
-  }
+  };
 
-  const position = direction === 'rtl' ? positionMap[themeConfig.toastPosition] : themeConfig.toastPosition
+  const position: ToastPosition = direction === 'rtl'
+    ? positionMap[themeConfig.toastPosition as ToastPosition] ?? 'top-right'
+    : themeConfig.toastPosition ?? 'top-right';
 
   return (
     <ToastifyWrapper {...boxProps}>
       <ToastContainer rtl={direction === 'rtl'} position={position} {...rest} />
     </ToastifyWrapper>
-  )
-}
+  );
+};
 
-export default AppReactToastify
+export default AppReactToastify;

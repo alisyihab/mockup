@@ -19,6 +19,8 @@
 // Type Imports
 import type { Mode, Skin, Layout, LayoutComponentPosition, LayoutComponentWidth } from '@core/types'
 
+import type { ToastPosition } from 'react-toastify'
+
 type Navbar = {
   type: LayoutComponentPosition
   contentWidth: LayoutComponentWidth
@@ -47,6 +49,7 @@ export type Config = {
   compactContentWidth: number
   footer: Footer
   disableRipple: boolean
+  toastPosition: ToastPosition
 }
 
 const themeConfig: Config = {
@@ -72,7 +75,8 @@ const themeConfig: Config = {
     contentWidth: 'compact', // 'compact', 'wide'
     detached: true //! true, false (This will not work in the Horizontal Layout)
   },
-  disableRipple: false // true, false
+  disableRipple: false, // true, false
+  toastPosition: 'top-right' // 'top-right', 'top-center', 'top-left', 'bottom-right', 'bottom-center', 'bottom-left'
 }
 
 export default themeConfig
