@@ -57,7 +57,7 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { cartCount } = useCart();
-  const isCartPage = currentPath === "/cart" || currentPath === '/payment';
+  const isCartPage = currentPath === "/cart" || currentPath === "/payment";
 
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("md"),
@@ -108,6 +108,17 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
         {/* Navigation Links */}
         {isMobile ? (
           <>
+            {/* Cart Icon for Mobile */}
+            <Badge badgeContent={cartCount} color="primary" sx={{ mr: 2 }}>
+              <IconButton
+                LinkComponent={Link}
+                href="/cart"
+                sx={{ color: "#fff" }}
+              >
+                <i className="ri-shopping-bag-3-fill"></i>
+              </IconButton>
+            </Badge>
+
             {/* Mobile Menu Button */}
             <IconButton
               onClick={() => setIsDrawerOpen(true)}
@@ -163,16 +174,9 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
                 >
                   Contact
                 </Button>
-
-                <Badge badgeContent={cartCount} color="primary" sx={{ mr: 3 }}>
-                  <IconButton href="#cart" sx={{ color: "#fff" }}>
-                    <i className="ri-shopping-bag-3-fill"></i>
-                  </IconButton>
-                </Badge>
-
                 <Button
                   variant="outlined"
-                  href="#login"
+                  href="/login"
                   sx={{
                     color: "#fff",
                     borderColor: "#fff",
