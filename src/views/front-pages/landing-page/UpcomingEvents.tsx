@@ -6,13 +6,12 @@ import {
   Card,
   CardContent,
   CardMedia,
-  MenuItem,
-  TextField,
   Button,
+  Tabs,
+  Tab,
 } from "@mui/material";
-
-import frontCommonStyles from "@views/front-pages/styles.module.css";
 import Link from "next/link";
+import frontCommonStyles from "@views/front-pages/styles.module.css";
 
 const UpcomingEvents = () => {
   const allEvents = [
@@ -29,7 +28,7 @@ const UpcomingEvents = () => {
     },
     {
       id: 2,
-      date: "AUG 20",
+      date: "20-08-2024",
       title: "JVJ 2011 JVJ Worldwide Concert Barcelona",
       description: "Directly seated and inside for you to enjoy the show.",
       image: "/images/front/2.jpg",
@@ -39,7 +38,7 @@ const UpcomingEvents = () => {
     },
     {
       id: 3,
-      date: "SEP 18",
+      date: "21-08-2024",
       title: "2011 Super Junior SM Town Live '10 World Tour New York City",
       description: "Directly seated and inside for you to enjoy the show.",
       image: "/images/front/3.jpg",
@@ -49,7 +48,7 @@ const UpcomingEvents = () => {
     },
     {
       id: 4,
-      date: "APR 14",
+      date: "22-02-2024",
       title: "Wonder Girls 2010 Wonder Girls World Tour San Francisco",
       description:
         "We'll get you directly seated and inside for you to enjoy the show.",
@@ -60,7 +59,7 @@ const UpcomingEvents = () => {
     },
     {
       id: 5,
-      date: "AUG 20",
+      date: "10-01-2025",
       title: "JVJ 2011 JVJ Worldwide Concert Barcelona",
       description: "Directly seated and inside for you to enjoy the show.",
       image: "/images/front/2.jpg",
@@ -70,7 +69,7 @@ const UpcomingEvents = () => {
     },
     {
       id: 6,
-      date: "SEP 18",
+      date: "03-01-2025",
       title: "2011 Super Junior SM Town Live '10 World Tour New York City",
       description: "Directly seated and inside for you to enjoy the show.",
       image: "/images/front/1.jpg",
@@ -80,7 +79,7 @@ const UpcomingEvents = () => {
     },
     {
       id: 7,
-      date: "SEP 18",
+      date: "20-08-2023",
       title: "2011 Super Junior SM Town Live '10 World Tour New York City",
       description: "Directly seated and inside for you to enjoy the show.",
       image: "/images/front/1.jpg",
@@ -90,171 +89,88 @@ const UpcomingEvents = () => {
     },
   ];
 
-  const [filters, setFilters] = useState({
-    weekdays: "",
-    eventType: "",
-    category: "",
+  const [category, setCategory] = useState("All");
+  const [subFilter, setSubFilter] = useState("new");
+
+  const handleCategoryChange = (event: React.SyntheticEvent, newValue: any) => {
+    setCategory(newValue);
+  };
+
+  const handleSubFilterChange = (filter: string) => {
+    setSubFilter(filter);
+  };
+
+  const filteredEvents = allEvents.filter((event) => {
+    if (category !== "All" && event.category !== category) return false;
+
+    const eventDate = new Date(event.date);
+    const now = new Date();
+
+    if (subFilter === "new" && eventDate < now) return false;
+    if (subFilter === "past" && eventDate >= now) return false;
+
+    return true;
   });
 
-  const [displayedEvents, setDisplayedEvents] = useState(allEvents.slice(0, 6));
-
-  const handleFilterChange = (key: any, value: any) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    applyFilters({ ...filters, [key]: value });
-  };
-
-  const applyFilters = (updatedFilters: any) => {
-    const filtered = allEvents.filter((event) => {
-      const matchWeekdays =
-        !updatedFilters.weekdays ||
-        event.date.startsWith(updatedFilters.weekdays);
-      const matchType =
-        !updatedFilters.eventType || event.type === updatedFilters.eventType;
-      const matchCategory =
-        !updatedFilters.category || event.category === updatedFilters.category;
-      return matchWeekdays && matchType && matchCategory;
-    });
-    setDisplayedEvents(filtered);
-  };
-
-  // Generate unique filter options from the data
-  const uniqueWeekdays = [
-    ...new Set(allEvents.map((event) => event.date.split(" ")[0])),
-  ];
-  const uniqueEventTypes = [...new Set(allEvents.map((event) => event.type))];
-  const uniqueCategories = [
-    ...new Set(allEvents.map((event) => event.category)),
-  ];
-
-  const handleLoadMore = () => {
-    const nextEvents = allEvents.slice(
-      displayedEvents.length,
-      displayedEvents.length + 6,
-    );
-    setDisplayedEvents([...displayedEvents, ...nextEvents]);
-  };
-
   return (
-    <section id="upcomingEvent" className="plb-[150px] bg-backgroundPaper">
+    <section id="upcomingEvent" className="plb-[50px] bg-backgroundPaper">
       <div className={frontCommonStyles.layoutSpacing}>
         <Box>
-          {/* Header Section */}
+          {/* Tabs for Categories */}
+          <Tabs
+            value={category}
+            onChange={handleCategoryChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{ mb: 3 }}
+          >
+            <Tab label="All" value="All" />
+            <Tab label="Rock" value="Rock" />
+            <Tab label="Pop" value="Pop" />
+            <Tab label="Kpop" value="Kpop" />
+          </Tabs>
+
+          {/* Sub-Filters */}
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 5,
-              flexDirection: {
-                xs: "column", // Stack vertically on small screens
-                sm: "row", // Align horizontally on medium and larger screens
-              },
-              gap: {
-                xs: 2, // Add spacing between elements on small screens
-                sm: 0, // No gap on medium and larger screens
-              },
+              gap: 2,
+              justifyContent: "right",
+              mt: 3,
+              mb: 3,
             }}
           >
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: "bold",
-                color: "#333",
-                textAlign: {
-                  xs: "center", // Center align text on small screens
-                  sm: "left", // Left align text on medium and larger screens
-                },
-                mb: {
-                  xs: 2, // Add margin-bottom on small screens
-                  sm: 0, // No margin-bottom on medium and larger screens
-                },
-              }}
+            <Button
+              variant={subFilter === "new" ? "contained" : "outlined"}
+              onClick={() => handleSubFilterChange("new")}
             >
-              Upcoming Events
-            </Typography>
-
-            {/* Filters */}
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexWrap: "wrap", // Wrap filters to new lines on smaller screens
-                justifyContent: {
-                  xs: "center", // Center align on small screens
-                  sm: "flex-end", // Align to the end on medium and larger screens
-                },
-              }}
+              New
+            </Button>
+            <Button
+              variant={subFilter === "past" ? "contained" : "outlined"}
+              onClick={() => handleSubFilterChange("past")}
             >
-              <TextField
-                select
-                label="Weekdays"
-                value={filters.weekdays}
-                onChange={(e) => handleFilterChange("weekdays", e.target.value)}
-                sx={{
-                  borderRadius: "20px",
-                  minWidth: {
-                    xs: "120px", // Smaller width on small screens
-                    sm: "150px", // Larger width on medium and larger screens
-                  },
-                }}
-              >
-                <MenuItem value="">All</MenuItem>
-                {uniqueWeekdays.map((weekday) => (
-                  <MenuItem key={weekday} value={weekday}>
-                    {weekday}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                select
-                label="Event Type"
-                value={filters.eventType}
-                onChange={(e) =>
-                  handleFilterChange("eventType", e.target.value)
-                }
-                sx={{
-                  borderRadius: "20px",
-                  minWidth: {
-                    xs: "120px",
-                    sm: "150px",
-                  },
-                }}
-              >
-                <MenuItem value="">All</MenuItem>
-                {uniqueEventTypes.map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {type}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                select
-                label="Any Category"
-                value={filters.category}
-                onChange={(e) => handleFilterChange("category", e.target.value)}
-                sx={{
-                  borderRadius: "20px",
-                  minWidth: {
-                    xs: "120px",
-                    sm: "150px",
-                  },
-                }}
-              >
-                <MenuItem value="">All</MenuItem>
-                {uniqueCategories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
+              Past
+            </Button>
+            <Button
+              variant={subFilter === "popular" ? "contained" : "outlined"}
+              onClick={() => handleSubFilterChange("popular")}
+            >
+              Popular
+            </Button>
+            <Button
+              variant={
+                subFilter === "recommendation" ? "contained" : "outlined"
+              }
+              onClick={() => handleSubFilterChange("recommendation")}
+            >
+              Recommendation
+            </Button>
           </Box>
 
           {/* Event List */}
           <Grid container spacing={3}>
-            {displayedEvents.map((event) => (
+            {filteredEvents.map((event) => (
               <Grid item xs={12} sm={6} md={4} key={event.id}>
                 <Link href={event.link} passHref legacyBehavior>
                   <Card
@@ -286,30 +202,17 @@ const UpcomingEvents = () => {
                     <CardContent>
                       <Typography
                         variant="subtitle1"
-                        sx={{
-                          fontWeight: "bold",
-                          color: "#7C4DFF",
-                          mb: 1,
-                        }}
+                        sx={{ fontWeight: "bold", color: "#7C4DFF", mb: 1 }}
                       >
                         {event.date}
                       </Typography>
                       <Typography
                         variant="h6"
-                        sx={{
-                          fontWeight: "bold",
-                          mb: 1,
-                          color: "#333",
-                        }}
+                        sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
                       >
                         {event.title}
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "#666",
-                        }}
-                      >
+                      <Typography variant="body2" sx={{ color: "#666" }}>
                         {event.description}
                       </Typography>
                     </CardContent>
@@ -318,29 +221,6 @@ const UpcomingEvents = () => {
               </Grid>
             ))}
           </Grid>
-
-          {/* Load More Button */}
-          {displayedEvents.length < allEvents.length && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                mt: 20,
-              }}
-            >
-              <Button
-                variant="outlined"
-                onClick={handleLoadMore}
-                sx={{
-                  padding: "10px 40px",
-                  borderRadius: "20px",
-                  fontWeight: "bold",
-                }}
-              >
-                Load More
-              </Button>
-            </Box>
-          )}
         </Box>
       </div>
     </section>

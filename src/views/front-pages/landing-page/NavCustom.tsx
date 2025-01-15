@@ -101,7 +101,7 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
               color: "#fff",
             }}
           >
-            Airtix
+            AiraTix
           </Typography>
         </Box>
 

@@ -92,7 +92,7 @@ export default function Payment() {
         frontCommonStyles.layoutSpacing,
       )}
     >
-      <Card>
+      <Card sx={{ mt: 15 }}>
         <Grid container>
           {/* Checkout Details */}
           <Grid item md={12} lg={7}>

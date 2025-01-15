@@ -11,7 +11,7 @@ import '@/app/globals.css'
 import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
-  title: 'Airatix - Tiket Online',
+  title: 'AiraTix - Tiket Online',
   description: 'Tempat Beli Tiket Event Online Terpercaya'
 }
 

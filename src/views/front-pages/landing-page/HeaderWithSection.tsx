@@ -1,55 +1,61 @@
-import {
-  Typography,
-  Button,
-  Box,
-  Grid,
-  TextField,
-  MenuItem,
-} from "@mui/material";
+import { Typography, Button, Box } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 import { Autoplay, Navigation, EffectFade } from "swiper/modules";
 import { useState } from "react";
-import NavCustom from "./NavCustom";
 
 const HeaderWithHeroSection = () => {
   const slides = [
     {
       id: 1,
+      title: "Rock On Stage",
+      description:
+        "Look no further! Our SBS The Show tickets are the simplest way for you to experience a live Kpop recording!",
+      link: "/events/healthtech-innovation-summit",
+      image: "/videos/hero.mp4",
+      date: "20-08-2024",
+      type: "Concert",
+      category: "Rock",
+      isVideo: true,
+    },
+    {
+      id: 2,
       title: "SBS MTV The Kpop Show Ticket Package",
       description:
         "Look no further! Our SBS The Show tickets are the simplest way for you to experience a live Kpop recording!",
       link: "/events/healthtech-innovation-summit",
       image: "/images/front/2.jpg",
+      date: "20-08-2024",
+      type: "Concert",
+      category: "Rock",
+      isVideo: false,
     },
     {
-      id: 2,
+      id: 3,
       title: "Jazz Concert Experience",
       description:
         "Enjoy a world-class jazz concert featuring top artists in the industry!",
       link: "/events/healthtech-innovation-summit",
       image: "/images/front/3.jpg",
+      isVideo: false,
     },
     {
-      id: 3,
+      id: 4,
       title: "Rock Night Festival",
       description:
         "Get ready to rock! Experience an unforgettable night of live music and energy.",
       link: "/events/healthtech-innovation-summit",
       image: "/images/front/1.jpg",
+      isVideo: false,
     },
   ];
 
   const [currentSlide, setCurrentSlide] = useState(slides[0]);
 
   return (
-    <Box sx={{ position: "relative", height: "60vh", overflow: "visible" }}>
-      {/* Navbar */}
-      {/* <NavCustom /> */}
-
-      {/* Hero Section */}
+    <Box sx={{ position: "relative", height: "80vh", overflow: "hidden" }}>
       <Swiper
         navigation={{
           nextEl: ".custom-next",
@@ -69,16 +75,36 @@ const HeaderWithHeroSection = () => {
           <SwiperSlide key={slide.id}>
             <Box
               sx={{
-                height: "60vh",
-                backgroundImage: `url(${slide.image})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
                 position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                height: "80vh",
+                overflow: "hidden",
               }}
             >
+              {slide.isVideo ? (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                >
+                  <source src={slide.image} type="video/mp4" />
+                </video>
+              ) : (
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundImage: `url(${slide.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+              )}
               {/* Overlay */}
               <Box
                 sx={{
@@ -87,13 +113,18 @@ const HeaderWithHeroSection = () => {
                   left: 0,
                   width: "100%",
                   height: "100%",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)", // Overlay transparan
+                  zIndex: 1, // Pastikan di atas video/gambar
                 }}
               />
               {/* Content */}
               <Box
                 sx={{
-                  zIndex: 2,
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)", // Memposisikan konten di tengah
+                  zIndex: 2, // Pastikan di atas Overlay
                   textAlign: "center",
                   color: "#fff",
                   maxWidth: "600px",
@@ -123,12 +154,29 @@ const HeaderWithHeroSection = () => {
                 </Typography>
                 <Button
                   variant="contained"
-                  sx={{ mr: 2, px: 4 }}
+                  sx={{
+                    mr: 2,
+                    px: 4,
+                    mt: {
+                      xs: 2,
+                      sm: 0,
+                    },
+                  }}
                   href={slide.link}
                 >
                   Get Ticket
                 </Button>
-                <Button variant="outlined" sx={{ px: 4 }} href={slide.link}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    px: 4,
+                    mt: {
+                      xs: 2,
+                      sm: 0,
+                    },
+                  }}
+                  href={slide.link}
+                >
                   Learn More
                 </Button>
               </Box>
@@ -169,60 +217,6 @@ const HeaderWithHeroSection = () => {
           ></i>
         </div>
       </Swiper>
-
-      {/* Search Box */}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: "-75px", // Atur posisi agar berada di bagian bawah hero section
-          left: "50%",
-          transform: "translateX(-50%) !important",
-          width: "90%",
-          maxWidth: "1200px",
-          padding: 10,
-          backgroundColor: "rgba(255, 255, 255, 0.95)",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-          borderRadius: "12px",
-          zIndex: 10,
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              label="Search Event"
-              variant="outlined"
-              defaultValue="Konser Jazz"
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              label="Place"
-              variant="outlined"
-              select
-              defaultValue="Indonesia"
-            >
-              <MenuItem value="Indonesia">Indonesia</MenuItem>
-              <MenuItem value="USA">USA</MenuItem>
-              <MenuItem value="Korea">Korea</MenuItem>
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              label="Time"
-              variant="outlined"
-              select
-              defaultValue="Any date"
-            >
-              <MenuItem value="Any date">Any date</MenuItem>
-              <MenuItem value="Today">Today</MenuItem>
-              <MenuItem value="Tomorrow">Tomorrow</MenuItem>
-            </TextField>
-          </Grid>
-        </Grid>
-      </Box>
     </Box>
   );
 };
