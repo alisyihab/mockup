@@ -109,11 +109,11 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
         {isMobile ? (
           <>
             {/* Cart Icon for Mobile */}
-            <Badge badgeContent={cartCount} color="primary" sx={{ mr: 2 }}>
+            <Badge badgeContent={cartCount} color="primary">
               <IconButton
                 LinkComponent={Link}
                 href="/cart"
-                sx={{ color: "#fff" }}
+                sx={{ color: "#fff", marginLeft: '150px' }} // Menambahkan margin kecil di kanan
               >
                 <i className="ri-shopping-bag-3-fill"></i>
               </IconButton>
@@ -123,8 +123,9 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
             <IconButton
               onClick={() => setIsDrawerOpen(true)}
               className="-mis-2"
+              sx={{ marginLeft: 1 }} // Menambahkan margin kecil di kiri
             >
-              <i className="ri-menu-line" />
+              <i className="ri-menu-line" style={{ color: "#fff" }} />
             </IconButton>
 
             {/* Drawer for Mobile Menu */}
