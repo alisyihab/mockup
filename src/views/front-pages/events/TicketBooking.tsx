@@ -29,7 +29,7 @@ export default function TicketBooking({
   eventSlug,
   eventTitle,
   eventLocation,
-  eventDate
+  eventDate,
 }: TicketBookingProps) {
   const [quantity, setQuantity] = useState(1);
   const { setCartCount } = useCart();
@@ -38,12 +38,26 @@ export default function TicketBooking({
     const storedCart = localStorage.getItem("cart");
     const cartItems = storedCart ? JSON.parse(storedCart) : [];
 
-    const newItem = { slug: eventSlug, title: eventTitle, price, quantity, date: eventDate, location: eventLocation};
-    cartItems.push(newItem);
+    const itemExists = cartItems.some((item: any) => item.slug === eventSlug);
 
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-    setCartCount(cartItems.length);
-    toast.success("Item added to cart!");
+    if (itemExists) {
+      // Jika item sudah ada, tampilkan notifikasi
+      toast.error("Item already in your cart!");
+    } else {
+      // Jika item belum ada, tambahkan ke cart
+      const newItem = {
+        slug: eventSlug,
+        title: eventTitle,
+        price,
+        quantity,
+        date: eventDate,
+        location: eventLocation,
+      };
+      cartItems.push(newItem);
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+      setCartCount(cartItems.length);
+      toast.success("Item added to cart!");
+    }
   };
 
   return (
