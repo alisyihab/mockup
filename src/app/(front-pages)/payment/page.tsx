@@ -211,6 +211,7 @@ export default function Payment() {
                 <Button
                   variant="contained"
                   onClick={handleSubmit}
+                  sx={{ color: '#fff' }}
                   endIcon={
                     <DirectionalIcon
                       ltrIconClass="ri-arrow-right-line"

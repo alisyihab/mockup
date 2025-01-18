@@ -1,17 +1,26 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
   Button,
   Tabs,
   Tab,
+  Card,
+  CardContent,
+  CardMedia,
+  Skeleton,
+  Grid,
 } from "@mui/material";
 import Link from "next/link";
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore from "swiper";
+import { Navigation, Pagination } from "swiper/modules";
 import frontCommonStyles from "@views/front-pages/styles.module.css";
+import styles from "./style/slider.module.css";
+
+SwiperCore.use([Navigation, Pagination]);
 
 const UpcomingEvents = () => {
   const allEvents = [
@@ -91,13 +100,100 @@ const UpcomingEvents = () => {
 
   const [category, setCategory] = useState("All");
   const [subFilter, setSubFilter] = useState("new");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className={frontCommonStyles.layoutSpacing}>
+        <Box sx={{ width: "100%", padding: "20px" }}>
+          <Skeleton
+            variant="rectangular"
+            width={400}
+            height={40}
+            sx={{
+              borderRadius: "8px",
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          />
+          {/* Tabs Skeleton */}
+          <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            {[...Array(4)].map((_, index) => (
+              <Skeleton
+                key={index}
+                variant="rectangular"
+                width={60}
+                height={40}
+                sx={{ borderRadius: "8px" }}
+              />
+            ))}
+          </Box>
+
+          {/* Cards Skeleton */}
+          <Grid container spacing={3}>
+            {[...Array(4)].map((_, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Box
+                  sx={{
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Image Skeleton */}
+                  <Skeleton
+                    variant="rectangular"
+                    height={140}
+                    sx={{ width: "100%" }}
+                  />
+                  <Box sx={{ padding: 2 }}>
+                    {/* Date Skeleton */}
+                    <Skeleton variant="text" width="40%" />
+                    {/* Title Skeleton */}
+                    <Skeleton variant="text" width="80%" />
+                    {/* Description Skeleton */}
+                    <Skeleton variant="text" width="100%" />
+                  </Box>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      </div>
+    );
+  }
 
   const handleCategoryChange = (event: React.SyntheticEvent, newValue: any) => {
     setCategory(newValue);
   };
 
-  const handleSubFilterChange = (filter: string) => {
-    setSubFilter(filter);
+  const formatDate = (date: string | number): string => {
+    const dateString = typeof date === "string" ? date : date.toString();
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const [day, month, year] = dateString.split("-");
+    const formattedMonth = months[parseInt(month, 10) - 1];
+    return `${parseInt(day, 10)} ${formattedMonth} ${year}`;
   };
 
   const filteredEvents = allEvents.filter((event) => {
@@ -112,115 +208,154 @@ const UpcomingEvents = () => {
     return true;
   });
 
+  const uniqueCategories = [
+    "All",
+    ...new Set(allEvents.map((event) => event.category)),
+  ];
+
   return (
-    <section id="upcomingEvent" className="plb-[50px] bg-backgroundPaper">
+    <section id="upcomingEvent" className="plb-[20px] bg-backgroundPaper">
       <div className={frontCommonStyles.layoutSpacing}>
+        <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: '20px' }}>
+          Upcoming Event
+        </Typography>
         <Box>
           {/* Tabs for Categories */}
           <Tabs
             value={category}
             onChange={handleCategoryChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{ mb: 3 }}
-          >
-            <Tab label="All" value="All" />
-            <Tab label="Rock" value="Rock" />
-            <Tab label="Pop" value="Pop" />
-            <Tab label="Kpop" value="Kpop" />
-          </Tabs>
-
-          {/* Sub-Filters */}
-          <Box
             sx={{
-              display: "flex",
-              gap: 2,
-              justifyContent: "right",
-              mt: 3,
-              mb: 3,
+              mb: 4,
+              borderBlockEnd: "none",
+              "& .MuiTabs-flexContainer": {
+                justifyContent: "left",
+                gap: 2,
+              },
+              "& .MuiTab-root": {
+                textTransform: "none",
+                padding: "6px 12px",
+                borderRadius: "8px",
+                fontSize:'12px',
+                minWidth: "unset",
+                backgroundColor: "#f5f5f5",
+                fontWeight: "bold",
+              },
+              "& .Mui-selected": {
+                backgroundColor: "#be7a95",
+                color: "#fff !important",
+              },
             }}
           >
-            <Button
-              variant={subFilter === "new" ? "contained" : "outlined"}
-              onClick={() => handleSubFilterChange("new")}
-            >
-              New
-            </Button>
-            <Button
-              variant={subFilter === "past" ? "contained" : "outlined"}
-              onClick={() => handleSubFilterChange("past")}
-            >
-              Past
-            </Button>
-            <Button
-              variant={subFilter === "popular" ? "contained" : "outlined"}
-              onClick={() => handleSubFilterChange("popular")}
-            >
-              Popular
-            </Button>
-            <Button
-              variant={
-                subFilter === "recommendation" ? "contained" : "outlined"
-              }
-              onClick={() => handleSubFilterChange("recommendation")}
-            >
-              Recommendation
-            </Button>
-          </Box>
-
-          {/* Event List */}
-          <Grid container spacing={3}>
-            {filteredEvents.map((event) => (
-              <Grid item xs={12} sm={6} md={4} key={event.id}>
-                <Link href={event.link} passHref legacyBehavior>
-                  <Card
-                    sx={{
-                      borderRadius: "12px",
-                      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                      cursor: "pointer",
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-5px)",
-                        boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-                      },
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      image={event.image}
-                      alt={event.title}
-                      sx={{
-                        borderTopLeftRadius: "12px",
-                        borderTopRightRadius: "12px",
-                      }}
-                    />
-                    <CardContent>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ fontWeight: "bold", color: "#7C4DFF", mb: 1 }}
-                      >
-                        {event.date}
-                      </Typography>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
-                      >
-                        {event.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "#666" }}>
-                        {event.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </Grid>
+            {uniqueCategories.map((cat, i) => (
+              <Tab key={i} label={cat} value={cat} />
             ))}
-          </Grid>
+          </Tabs>
+
+          {/* Event Slider */}
+          <div className={styles.swiperContainer}>
+            <Swiper
+              slidesPerView={4} // Default untuk desktop
+              spaceBetween={20}
+              navigation={{
+                nextEl: `.${styles.swiperButtonNext}`,
+                prevEl: `.${styles.swiperButtonPrev}`,
+              }}
+              pagination={{ clickable: true }}
+              breakpoints={{
+                0: {
+                  slidesPerView: 1,
+                  spaceBetween: 10,
+                },
+                600: {
+                  slidesPerView: 2,
+                  spaceBetween: 15,
+                },
+                960: {
+                  slidesPerView: 3,
+                  spaceBetween: 20,
+                },
+                1280: {
+                  slidesPerView: 4,
+                  spaceBetween: 20,
+                },
+              }}
+            >
+              {filteredEvents.map((event) => (
+                <SwiperSlide key={`event-${event.id}`}>
+                  <Link href={event.link} passHref legacyBehavior>
+                    <Card
+                      sx={{
+                        borderRadius: "12px",
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                        cursor: "pointer",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-5px)",
+                          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+                        },
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={event.image}
+                        alt={event.title}
+                        sx={{
+                          borderTopLeftRadius: "12px",
+                          borderTopRightRadius: "12px",
+                        }}
+                      />
+                      <CardContent>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ color: "#7C4DFF", fontWeight: "bold", mb: 4 }}
+                        >
+                          {formatDate(event.date)}
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
+                        >
+                          {event.title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "#666" }}>
+                          {event.description}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {/* Custom Navigation */}
+            {filteredEvents.length > 4 ? (
+              <>
+                <div
+                  className={`${styles.swiperButtonPrev} ${styles.customNav}`}
+                >
+                  <i
+                    className="ri-arrow-drop-left-line"
+                    style={{ fontSize: "1.8rem" }}
+                  />
+                </div>
+                <div
+                  className={`${styles.swiperButtonNext} ${styles.customNav}`}
+                >
+                  <i
+                    className="ri-arrow-drop-right-line"
+                    style={{ fontSize: "1.8rem" }}
+                  />
+                </div>
+              </>
+            ) : (
+              ""
+            )}
+          </div>
         </Box>
       </div>
     </section>

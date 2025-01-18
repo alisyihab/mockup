@@ -271,6 +271,7 @@ export default function CartPage() {
                           mt: 3,
                           textTransform: "none",
                           fontWeight: "bold",
+                          color: '#fff'
                         }}
                         LinkComponent={Link}
                         href="/payment"

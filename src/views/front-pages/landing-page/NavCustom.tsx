@@ -39,9 +39,9 @@ const StickyAppBar = styled(AppBar)<StickyAppBarProps>(
     position: isSticky ? "fixed" : "absolute",
     top: isCartPage ? 0 : isSticky ? 0 : "20px",
     backgroundColor: isCartPage
-      ? "rgba(0, 0, 0, 1)" // Opaque background for the cart page
+      ? "rgb(255, 255, 255)" // Opaque background for the cart page
       : isSticky
-        ? "rgba(0, 0, 0, 0.8)"
+        ? "rgba(255, 255, 255)"
         : "transparent",
     boxShadow:
       isSticky || isCartPage ? "0px 4px 6px rgba(0, 0, 0, 0.1)" : "none",
@@ -57,7 +57,10 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { cartCount } = useCart();
-  const isCartPage = currentPath === "/cart" || currentPath === "/payment";
+  const isCartPage =
+    currentPath === "/cart" ||
+    currentPath === "/payment" ||
+    currentPath == "/explore";
 
   const isMobile = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down("md"),
@@ -87,22 +90,32 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
       >
         {/* Logo */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Link href="/">
-            <img
-              src="/logo.png"
-              alt="AiraTix Logo"
-              style={{ height: "50px", marginRight: "8px" }}
-            />
+          <Link href="/" passHref>
+            <Box
+              component="a"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
+              <img
+                src="/logo.png"
+                alt="AiraTix Logo"
+                style={{ height: "50px", marginRight: "8px" }}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  color: isSticky || isCartPage ? "black" : "white",
+                }}
+              >
+                AiraTix
+              </Typography>
+            </Box>
           </Link>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "bold",
-              color: "#fff",
-            }}
-          >
-            AiraTix
-          </Typography>
         </Box>
 
         {/* Navigation Links */}
@@ -113,9 +126,15 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
               <IconButton
                 LinkComponent={Link}
                 href="/cart"
-                sx={{ color: "#fff", marginLeft: '150px' }} // Menambahkan margin kecil di kanan
+                sx={{
+                  color: isSticky || isCartPage ? "#000" : "#fff",
+                  marginLeft: "150px",
+                }}
               >
-                <i className="ri-shopping-bag-3-fill"></i>
+                <i
+                  className="ri-shopping-bag-3-fill"
+                  style={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
+                />
               </IconButton>
             </Badge>
 
@@ -123,9 +142,15 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
             <IconButton
               onClick={() => setIsDrawerOpen(true)}
               className="-mis-2"
-              sx={{ marginLeft: 1 }} // Menambahkan margin kecil di kiri
+              sx={{
+                marginLeft: 1,
+                color: isSticky || isCartPage ? "#000" : "#fff",
+              }}
             >
-              <i className="ri-menu-line" style={{ color: "#fff" }} />
+              <i
+                className="ri-menu-line"
+                style={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
+              />
             </IconButton>
 
             {/* Drawer for Mobile Menu */}
@@ -194,36 +219,39 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
           </>
         ) : (
           <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-            <Button href="#schedule" sx={{ color: "#fff", fontWeight: "bold" }}>
-              Schedule
-            </Button>
-            <Button href="#speakers" sx={{ color: "#fff", fontWeight: "bold" }}>
-              Speakers
-            </Button>
-            <Button href="#ticket" sx={{ color: "#fff", fontWeight: "bold" }}>
-              Ticket
-            </Button>
-            <Button href="#contact" sx={{ color: "#fff", fontWeight: "bold" }}>
-              Contact
+            <Button
+              LinkComponent={Link}
+              href="/explore"
+              sx={{
+                color: isSticky || isCartPage ? "#000" : "#fff",
+                fontWeight: "bold",
+              }}
+            >
+              Explore &nbsp; <i className="ri-global-line"></i>
             </Button>
             <Badge badgeContent={cartCount} color="primary" sx={{ mr: 3 }}>
               <IconButton
                 LinkComponent={Link}
                 href="/cart"
-                sx={{ color: "#fff" }}
+                sx={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
               >
-                <i className="ri-shopping-bag-3-fill"></i>
+                <i
+                  className="ri-shopping-bag-3-fill"
+                  style={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
+                />
               </IconButton>
             </Badge>
             <Button
               variant="outlined"
               href="/login"
               sx={{
-                color: "#fff",
-                borderColor: "#fff",
+                color: isSticky || isCartPage ? "#000" : "#fff",
+                borderColor: isSticky || isCartPage ? "#000" : "#fff",
                 fontWeight: "bold",
+                transition: "all 0.3s ease",
                 "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  backgroundColor: "rgba(0, 0, 0, 0.1)",
+                  color: "#000",
                 },
               }}
             >
