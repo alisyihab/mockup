@@ -1,0 +1,19 @@
+.slider-container {
+  width: 80%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.slider-inner {
+  width: 120%;
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(-20%);
+}
+
+.slider-item {
+  width: 20%;
+  height: 100px;
+  background-color: #ccc;
+  margin-right: 10px;
+  display: inline-block;
+}

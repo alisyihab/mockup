@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import type { Theme } from "@mui/material/styles";
 import Link from "next/link";
-import { useCart } from "@/contexts/CartContext";
 
 const bounceAnimation = keyframes`
   0%, 20%, 50%, 80%, 100% {
@@ -39,7 +38,7 @@ const StickyAppBar = styled(AppBar)<StickyAppBarProps>(
     position: isSticky ? "fixed" : "absolute",
     top: isCartPage ? 0 : isSticky ? 0 : "20px",
     backgroundColor: isCartPage
-      ? "rgb(255, 255, 255)" // Opaque background for the cart page
+      ? "rgb(255, 255, 255)"
       : isSticky
         ? "rgba(255, 255, 255)"
         : "transparent",
@@ -56,10 +55,9 @@ const StickyAppBar = styled(AppBar)<StickyAppBarProps>(
 const NavCustom = ({ currentPath }: { currentPath: string }) => {
   const [isSticky, setIsSticky] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { cartCount } = useCart();
   const isCartPage =
-    currentPath === "/cart" ||
-    currentPath === "/payment" ||
+    currentPath === "/checkout" ||
+    currentPath === "/payment-success" ||
     currentPath == "/explore";
 
   const isMobile = useMediaQuery((theme: Theme) =>
@@ -122,10 +120,10 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
         {isMobile ? (
           <>
             {/* Cart Icon for Mobile */}
-            <Badge badgeContent={cartCount} color="primary">
+            {/* <Badge badgeContent={cartCount} color="primary">
               <IconButton
                 LinkComponent={Link}
-                href="/cart"
+                href="/checkout"
                 sx={{
                   color: isSticky || isCartPage ? "#000" : "#fff",
                   marginLeft: "150px",
@@ -136,7 +134,7 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
                   style={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
                 />
               </IconButton>
-            </Badge>
+            </Badge> */}
 
             {/* Mobile Menu Button */}
             <IconButton
@@ -177,32 +175,15 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
                   <i className="ri-close-line" />
                 </IconButton>
                 <Button
-                  href="#schedule"
+                  LinkComponent={Link}
+                  href="/explore"
                   sx={{ color: "#fff", fontWeight: "bold" }}
                 >
-                  Schedule
-                </Button>
-                <Button
-                  href="#speakers"
-                  sx={{ color: "#fff", fontWeight: "bold" }}
-                >
-                  Speakers
-                </Button>
-                <Button
-                  href="#ticket"
-                  sx={{ color: "#fff", fontWeight: "bold" }}
-                >
-                  Ticket
-                </Button>
-                <Button
-                  href="#contact"
-                  sx={{ color: "#fff", fontWeight: "bold" }}
-                >
-                  Contact
+                  Explore &nbsp; <i className="ri-global-line"></i>
                 </Button>
                 <Button
                   variant="outlined"
-                  href="/login"
+                  href={`${process.env.NEXT_PUBLIC_FE_BASE_URL}/auth/login`}
                   sx={{
                     color: "#fff",
                     borderColor: "#fff",
@@ -229,10 +210,10 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
             >
               Explore &nbsp; <i className="ri-global-line"></i>
             </Button>
-            <Badge badgeContent={cartCount} color="primary" sx={{ mr: 3 }}>
+            {/* <Badge badgeContent={cartCount} color="primary" sx={{ mr: 3 }}>
               <IconButton
                 LinkComponent={Link}
-                href="/cart"
+                href="/checkout"
                 sx={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
               >
                 <i
@@ -240,10 +221,10 @@ const NavCustom = ({ currentPath }: { currentPath: string }) => {
                   style={{ color: isSticky || isCartPage ? "#000" : "#fff" }}
                 />
               </IconButton>
-            </Badge>
+            </Badge> */}
             <Button
               variant="outlined"
-              href="/login"
+              href={`${process.env.NEXT_PUBLIC_FE_BASE_URL}/auth/login`}
               sx={{
                 color: isSticky || isCartPage ? "#000" : "#fff",
                 borderColor: isSticky || isCartPage ? "#000" : "#fff",

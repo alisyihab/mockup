@@ -25,7 +25,6 @@ import "@/app/globals.css";
 
 // Generated Icon CSS Imports
 import "@assets/iconify-icons/generated-icons.css";
-import { CartProvider } from "@/contexts/CartContext";
 
 export const metadata = {
   title: "AiraTix",
@@ -38,34 +37,39 @@ const Layout = ({ children }: ChildrenType) => {
 
   return (
     <html id="__next">
+      <head>
+         <script
+          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+          async
+        ></script>
+      </head>
       <body className="flex is-full min-bs-full flex-auto flex-col">
-        <CartProvider>
-          <Providers direction="ltr">
-            <BlankLayout systemMode={systemMode}>
-              <IntersectionProvider>
-                {/* Pass currentPath to FrontLayout */}
-                <FrontLayout>
-                  {children}
-                  <Toaster
-                    position="top-right"
-                    reverseOrder={false}
-                    toastOptions={{
-                      duration: 5000,
-                    }}
-                  />
-                  <ScrollToTop className="mui-fixed">
-                    <Button
-                      variant="contained"
-                      className="is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center"
-                    >
-                      <i className="ri-arrow-up-line" />
-                    </Button>
-                  </ScrollToTop>
-                </FrontLayout>
-              </IntersectionProvider>
-            </BlankLayout>
-          </Providers>
-        </CartProvider>
+        <Providers direction="ltr">
+          <BlankLayout systemMode={systemMode}>
+            <IntersectionProvider>
+              {/* Pass currentPath to FrontLayout */}
+              <FrontLayout>
+                {children}
+                <Toaster
+                  position="top-right"
+                  reverseOrder={false}
+                  toastOptions={{
+                    duration: 5000,
+                  }}
+                />
+                <ScrollToTop className="mui-fixed">
+                  <Button
+                    variant="contained"
+                    className="is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center"
+                  >
+                    <i className="ri-arrow-up-line" />
+                  </Button>
+                </ScrollToTop>
+              </FrontLayout>
+            </IntersectionProvider>
+          </BlankLayout>
+        </Providers>
       </body>
     </html>
   );

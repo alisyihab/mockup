@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -12,20 +12,9 @@ import {
 } from "@mui/material";
 
 import frontCommonStyles from "@views/front-pages/styles.module.css";
+import httpClient from "@/utils/httpClient";
 
-// Generate 8 dummy events dynamically
-const events = Array.from({ length: 8 }, (_, index) => ({
-  id: index + 1,
-  title: `Event Title ${index + 1}`,
-  date: `Date ${index + 1}`,
-  location: `Location ${index + 1}`,
-  price: `From $${(index + 1) * 10}`,
-  followers: `${(index + 1) * 100} followers`,
-  image: "https://placehold.co/400x200",
-  promoted: index % 2 === 0, // Alternate between promoted and non-promoted
-}));
-
-const EventCard = ({ event }: { event: (typeof events)[0] }) => {
+const EventCard = ({ event }: { event: any }) => {
   return (
     <Card
       sx={{
@@ -40,8 +29,8 @@ const EventCard = ({ event }: { event: (typeof events)[0] }) => {
       <CardMedia
         component="img"
         height="140"
-        image={event.image}
-        alt={event.title}
+        image={`${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${event.image}` || "https://placehold.co/400x200"}
+        alt={event.title || "Event Image"}
       />
       <CardContent>
         <Typography
@@ -49,19 +38,19 @@ const EventCard = ({ event }: { event: (typeof events)[0] }) => {
           sx={{ fontWeight: "bold", mb: 1 }}
           noWrap
         >
-          {event.title}
+          {event.title || "Untitled Event"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {event.date}
+          {event.date || "No date available"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {event.location}
+          {event.location || "No location provided"}
         </Typography>
         <Typography variant="body2" sx={{ fontWeight: "bold", mt: 1 }}>
-          {event.price}
+          {event.price ? `From ${event.price}` : "Free"}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {event.followers}
+          {event.followers || "No followers"}
         </Typography>
         {event.promoted && (
           <Typography
@@ -83,6 +72,28 @@ const EventCard = ({ event }: { event: (typeof events)[0] }) => {
 };
 
 const EventList = () => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await httpClient.get("/event-online");
+        setEvents(response.data || []);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch events. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
   return (
     <section className="plb-[20px] bg-backgroundPaper">
       <div className={frontCommonStyles.layoutSpacing}>
@@ -97,7 +108,7 @@ const EventList = () => {
             }}
           >
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Popular Online Event
+              Popular Online Events
             </Typography>
             <Link
               href="/explore"
@@ -108,14 +119,35 @@ const EventList = () => {
             </Link>
           </Box>
 
+          {/* Loading and Error States */}
+          {loading && (
+            <Typography variant="body1" color="text.secondary">
+              Loading events...
+            </Typography>
+          )}
+          {error && (
+            <Typography variant="body1" color="error">
+              {error}
+            </Typography>
+          )}
+
           {/* Event Grid */}
-          <Grid container spacing={3}>
-            {events.map((event) => (
-              <Grid item xs={12} sm={6} md={3} key={event.id}>
-                <EventCard event={event} />
-              </Grid>
-            ))}
-          </Grid>
+          {!loading && !error && events.length > 0 && (
+            <Grid container spacing={3}>
+              {events.map((event) => (
+                <Grid item xs={12} sm={6} md={3} key={event.id}>
+                  <EventCard event={event} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+
+          {/* No Data Available */}
+          {!loading && !error && events.length === 0 && (
+            <Typography variant="body1" color="text.secondary">
+              No events available at the moment.
+            </Typography>
+          )}
         </Box>
       </div>
     </section>

@@ -1,36 +1,22 @@
-"use client";
+'use client'
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-
-interface CartContextType {
-  cartCount: number;
-  setCartCount: (count: number) => void;
+interface CartItem {
+  ticketID: number;
+  title: string;
+  price: number;
+  quantity: number;
+  date: string;
+  location: string;
+  ticket_prices_id: number;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+interface CartContextProps {
+  cart: CartItem[];
+  setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
+}
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartCount, setCartCount] = useState<number>(0);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedCart = localStorage.getItem("cart");
-      setCartCount(storedCart ? JSON.parse(storedCart).length : 0);
-    }
-  }, []);
-
-  return (
-    <CartContext.Provider value={{ cartCount, setCartCount }}>
-      {children}
-    </CartContext.Provider>
-  );
-};
+const CartContext = createContext<CartContextProps | undefined>(undefined);
 
 export const useCart = () => {
   const context = useContext(CartContext);
@@ -38,4 +24,21 @@ export const useCart = () => {
     throw new Error("useCart must be used within a CartProvider");
   }
   return context;
+};
+
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const storedCart = localStorage.getItem("cart");
+    return storedCart ? JSON.parse(storedCart) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  return (
+    <CartContext.Provider value={{ cart, setCart }}>
+      {children}
+    </CartContext.Provider>
+  );
 };

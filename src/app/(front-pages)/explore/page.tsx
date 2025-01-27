@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Grid,
   Typography,
-  TextField,
   FormControlLabel,
   Switch,
   List,
@@ -18,25 +18,27 @@ import {
 } from "@mui/material";
 
 import frontCommonStyles from "@views/front-pages/styles.module.css";
+import httpClient from "@/utils/httpClient";
+import formatRupiah from "@/utils/formatRupiah";
 
 // Define types
 interface Event {
   id: number;
   title: string;
-  date: string;
-  price: string;
-  location: string;
-  format: string;
-  topic: string;
-  organizer: string;
+  start_date: string;
+  price: number;
+  location_details: string;
+  is_online_event: boolean;
+  topic_id: number;
+  organizer_name: string;
   image: string;
+  link: string;
 }
 
 interface Filters {
   online: boolean;
-  locations: string[];
   format: string[];
-  topics: string[];
+  topics: number[];
 }
 
 const ExploreEventPage: React.FC = () => {
@@ -44,91 +46,62 @@ const ExploreEventPage: React.FC = () => {
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [topics, setTopics] = useState<{ id: number; name: string }[]>([]);
   const [filters, setFilters] = useState<Filters>({
     online: false,
-    locations: [],
     format: [],
     topics: [],
   });
 
-  const locations: string[] = [
-    "Semua Lokasi",
-    "Bali",
-    "Bandung",
-    "DKI Jakarta",
-    "Surabaya",
-  ];
   const formats: string[] = ["Online", "Offline"];
-  const topics: string[] = [
-    "Education",
-    "Art",
-    "Sports",
-    "Music",
-    "Technology",
-  ];
 
-  // Dummy API fetch for events
-  const fetchEvents = (start: number, limit: number): Event[] => {
-    return Array.from({ length: limit }, (_, i) => ({
-      id: start + i,
-      title: `Event Title ${start + i}`,
-      date: "2025-01-19",
-      price: `${(start + i) * 10000}`,
-      location: locations[(start + i) % locations.length],
-      format: formats[(start + i) % formats.length],
-      topic: topics[(start + i) % topics.length],
-      organizer: `Organizer ${start + i}`,
-      image: "https://placehold.co/400x200",
-    }));
-  };
-
-  // Load initial events
+  // Load events from API
   useEffect(() => {
-    loadMoreEvents();
-  }, []);
-
-  const loadMoreEvents = (): void => {
-    if (loading || !hasMore) return;
-
-    setLoading(true);
-    setTimeout(() => {
-      const newEvents = fetchEvents(events.length, 8);
-      setEvents((prev) => [...prev, ...newEvents]);
-      setFilteredEvents((prev) => [...prev, ...newEvents]);
-      if (newEvents.length < 8) setHasMore(false);
-      setLoading(false);
-    }, 1000);
-  };
-
-  // Infinite scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-          document.documentElement.offsetHeight - 100 &&
-        hasMore &&
-        !loading
-      ) {
-        loadMoreEvents();
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const response = await httpClient.get("/explore");
+        setEvents(response.data.data || []);
+        setFilteredEvents(response.data.data || []);
+        setHasMore(response.data.next_page_url !== null);
+      } catch (error) {
+        console.error("Failed to fetch events:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [loading, hasMore]);
+    fetchEvents();
+  }, []);
+
+  // Load topics from API
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await httpClient.get("/get-topic");
+        setTopics(Array.isArray(response.data.data) ? response.data.data : []);
+      } catch (error) {
+        console.error("Failed to fetch topics:", error);
+      }
+    };
+
+    fetchTopics();
+  }, []);
 
   // Apply filters
   useEffect(() => {
     const filtered = events.filter((event) => {
-      if (filters.online && event.format !== "Online") return false;
-      if (
-        filters.locations.length > 0 &&
-        !filters.locations.includes(event.location)
-      )
-        return false;
-      if (filters.format.length > 0 && !filters.format.includes(event.format))
-        return false;
-      if (filters.topics.length > 0 && !filters.topics.includes(event.topic))
+      if (filters.online && !event.is_online_event) return false;
+      if (filters.format.length > 0) {
+        const isOnline = filters.format.includes("Online");
+        const isOffline = filters.format.includes("Offline");
+        if (
+          (isOnline && !event.is_online_event) ||
+          (isOffline && event.is_online_event)
+        )
+          return false;
+      }
+      if (filters.topics.length > 0 && !filters.topics.includes(event.topic_id))
         return false;
       return true;
     });
@@ -139,7 +112,7 @@ const ExploreEventPage: React.FC = () => {
   // Handle filter changes
   const handleFilterChange = (
     key: keyof Filters,
-    value: boolean | string[],
+    value: boolean | string[] | number[],
   ): void => {
     setFilters((prev) => ({
       ...prev,
@@ -177,37 +150,6 @@ const ExploreEventPage: React.FC = () => {
             label="Event Online"
           />
 
-          {/* Location Filter */}
-          <Typography variant="subtitle1" sx={{ mt: 3, mb: 1 }}>
-            Lokasi
-          </Typography>
-          <TextField
-            placeholder="Cari lokasi..."
-            fullWidth
-            size="small"
-            sx={{ mb: 2 }}
-          />
-          <List dense>
-            {locations.map((location) => (
-              <ListItem key={location} disablePadding>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={(e) => {
-                        const value = e.target.checked
-                          ? [...filters.locations, location]
-                          : filters.locations.filter((loc) => loc !== location);
-                        handleFilterChange("locations", value);
-                      }}
-                    />
-                  }
-                  label={location}
-                  sx={{ ml: 1 }}
-                />
-              </ListItem>
-            ))}
-          </List>
-
           {/* Format Filter */}
           <Typography variant="subtitle1" sx={{ mt: 3, mb: 1 }}>
             Format
@@ -239,19 +181,19 @@ const ExploreEventPage: React.FC = () => {
           </Typography>
           <List dense>
             {topics.map((topic) => (
-              <ListItem key={topic} disablePadding>
+              <ListItem key={topic.id} disablePadding>
                 <FormControlLabel
                   control={
                     <Checkbox
                       onChange={(e) => {
                         const value = e.target.checked
-                          ? [...filters.topics, topic]
-                          : filters.topics.filter((tp) => tp !== topic);
+                          ? [...filters.topics, topic.id]
+                          : filters.topics.filter((tp) => tp !== topic.id);
                         handleFilterChange("topics", value);
                       }}
                     />
                   }
-                  label={topic}
+                  label={topic.name}
                   sx={{ ml: 1 }}
                 />
               </ListItem>
@@ -278,7 +220,11 @@ const ExploreEventPage: React.FC = () => {
                   <CardMedia
                     component="img"
                     height="140"
-                    image={event.image}
+                    image={
+                      event.image
+                        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${event.image}`
+                        : "https://placehold.co/140x140.png?text=No+Image"
+                    }
                     alt={event.title}
                   />
                   <CardContent>
@@ -289,13 +235,13 @@ const ExploreEventPage: React.FC = () => {
                       {event.title}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#666", mb: 1 }}>
-                      {event.date}
+                      {event.start_date}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#000", mb: 1 }}>
-                      Rp{event.price}
+                      {formatRupiah(event.price)}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#999" }}>
-                      {event.organizer}
+                      {event.organizer_name}
                     </Typography>
                   </CardContent>
                 </Card>

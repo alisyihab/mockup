@@ -14,7 +14,7 @@ import CategoryList from "./category";
 import TopEvent from "./TopEvent";
 import EventList from "./PopularEvent";
 import CustomerReviews from "./CustomerReviews";
-import PopularByCountry from "./Popularcountry";
+import PopularByCountry from "./EventOther";
 
 const LandingPageWrapper = ({ mode }: { mode: Mode }) => {
   // Hooks

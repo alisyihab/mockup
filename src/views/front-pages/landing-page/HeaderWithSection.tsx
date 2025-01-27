@@ -4,61 +4,85 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 import { Autoplay, Navigation, EffectFade } from "swiper/modules";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./style/slider.module.css";
+import httpClient from "@/utils/httpClient";
+
+interface Slide {
+  id: number;
+  title: string;
+  description: string;
+  link: string;
+  image: string;
+  isVideo: boolean;
+}
 
 const HeaderWithHeroSection = () => {
-  const slides = [
-    {
-      id: 1,
-      title: "Rock On Stage",
-      description:
-        "Look no further! Our SBS The Show tickets are the simplest way for you to experience a live Kpop recording!",
-      link: "/events/healthtech-innovation-summit",
-      image: "/videos/hero.mp4",
-      date: "20-08-2024",
-      type: "Concert",
-      category: "Rock",
-      isVideo: true,
-    },
-    {
-      id: 2,
-      title: "SBS MTV The Kpop Show Ticket Package",
-      description:
-        "Look no further! Our SBS The Show tickets are the simplest way for you to experience a live Kpop recording!",
-      link: "/events/healthtech-innovation-summit",
-      image: "/images/front/2.jpg",
-      date: "20-08-2024",
-      type: "Concert",
-      category: "Rock",
-      isVideo: false,
-    },
-    {
-      id: 3,
-      title: "Jazz Concert Experience",
-      description:
-        "Enjoy a world-class jazz concert featuring top artists in the industry!",
-      link: "/events/healthtech-innovation-summit",
-      image: "/images/front/3.jpg",
-      isVideo: false,
-    },
-    {
-      id: 4,
-      title: "Rock Night Festival",
-      description:
-        "Get ready to rock! Experience an unforgettable night of live music and energy.",
-      link: "/events/healthtech-innovation-summit",
-      image: "/images/front/1.jpg",
-      isVideo: false,
-    },
-  ];
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [currentSlide, setCurrentSlide] = useState<Slide | null>(null);
 
-  const [currentSlide, setCurrentSlide] = useState(slides[0]);
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const response = await httpClient.get<Slide[]>("/slides");
+        const slidesWithFallback = response.data;
+        setSlides(slidesWithFallback);
+        setCurrentSlide(slidesWithFallback[0] || null);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching slides:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, []);
+
+  const duplicatedSlides =
+    slides.length < 3 ? [...slides, ...slides, ...slides] : slides;
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "65vh",
+        }}
+      >
+        <Typography variant="h6">Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (slides.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "65vh",
+        }}
+      >
+        <Typography variant="h6">No slides available</Typography>
+      </Box>
+    );
+  }
+
+  const truncateText = (text: any, maxLength: any) => {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
 
   return (
     <Box sx={{ position: "relative", height: "65vh" }}>
       <div className={styles.swiperContainer}>
         <Swiper
+          onSlideChange={(swiper) => setCurrentSlide(slides[swiper.realIndex])}
           navigation={{
             nextEl: `.${styles.swiperButtonNextHero}`,
             prevEl: `.${styles.swiperButtonPrevHero}`,
@@ -72,8 +96,8 @@ const HeaderWithHeroSection = () => {
             delay: 5000,
           }}
         >
-          {slides.map((slide) => (
-            <SwiperSlide key={slide.id}>
+          {duplicatedSlides.map((slide, index) => (
+            <SwiperSlide key={`slide-${index}`}>
               <Box
                 sx={{
                   position: "relative",
@@ -100,7 +124,11 @@ const HeaderWithHeroSection = () => {
                     sx={{
                       width: "100%",
                       height: "100%",
-                      backgroundImage: `url(${slide.image})`,
+                      backgroundImage: `url(${
+                        slide.image
+                          ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${slide.image}`
+                          : `https://placehold.co/600x400?text=${slide.title}`
+                      })`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                     }}
@@ -148,9 +176,10 @@ const HeaderWithHeroSection = () => {
                       color: "#fff",
                       textShadow: "0px 2px 5px rgba(0,0,0,0.7)",
                     }}
-                  >
-                    {slide.description}
-                  </Typography>
+                    dangerouslySetInnerHTML={{
+                      __html: truncateText(slide.description, 200),
+                    }}
+                  />
                   <Button
                     variant="contained"
                     sx={{ mr: 2, px: 4 }}

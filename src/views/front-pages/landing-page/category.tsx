@@ -8,71 +8,53 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import frontCommonStyles from "@views/front-pages/styles.module.css";
 import styles from "./style/slider.module.css";
+import httpClient from "@/utils/httpClient";
 
-const categories = [
-  {
-    name: "Festival Fair Bazaar",
-    image: "https://placehold.co/200x200?text=Festival&font=roboto",
-  },
-  {
-    name: "Konser",
-    image: "https://placehold.co/200x200?text=Konser&font=roboto",
-  },
-  {
-    name: "Pertandingan",
-    image: "https://placehold.co/200x200?text=Pertandingan&font=roboto",
-  },
-  {
-    name: "Exhibition Expo Pameran",
-    image: "https://placehold.co/200x200?text=Exhibition&font=roboto",
-  },
-  {
-    name: "Konferensi",
-    image: "https://placehold.co/200x200?text=Konferensi&font=roboto",
-  },
-  {
-    name: "Workshop",
-    image: "https://placehold.co/200x200?text=Workshop&font=roboto",
-  },
-  {
-    name: "Pertunjukan",
-    image: "https://placehold.co/200x200?text=Pertunjukan&font=roboto",
-  },
-  {
-    name: "Atraksi dan Theme Park",
-    image: "https://placehold.co/200x200?text=Theme+Park&font=roboto",
-  },
-];
+interface Category {
+  name: string;
+  image?: string;
+}
+
+interface ApiResponse {
+  data: Category[];
+}
 
 const CategoryList = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-      const timer = setTimeout(() => {
+    // Fungsi untuk mengambil data dari API
+    const fetchCategories = async () => {
+      try {
+        const response = await httpClient.get<ApiResponse>("/get-format");
+        setCategories(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
         setIsLoading(false);
-      }, 500);
+      }
+    };
 
-      return () => clearTimeout(timer);
-    }, []);
+    fetchCategories();
+  }, []);
 
   if (isLoading) {
     return (
-      <>
-        <div className={frontCommonStyles.layoutSpacing}>
-          <Box sx={{ width: "100%", padding: "20px" }}>
-            <Skeleton
-              variant="rectangular"
-              width={1200}
-              height={80}
-              sx={{
-                borderRadius: "8px",
-                marginTop: "10px",
-                marginBottom: "10px",
-              }}
-            />
-          </Box>
-        </div>
-      </>
+      <div className={frontCommonStyles.layoutSpacing}>
+        <Box sx={{ width: "100%", padding: "20px" }}>
+          <Skeleton
+            variant="rectangular"
+            width={1200}
+            height={80}
+            sx={{
+              borderRadius: "8px",
+              marginTop: "10px",
+              marginBottom: "10px",
+            }}
+          />
+        </Box>
+      </div>
     );
   }
 
@@ -103,7 +85,10 @@ const CategoryList = () => {
                     sx={{
                       width: "100%",
                       height: "200px",
-                      background: `url(${category.image})`,
+                      background: `url(${
+                        category.image ||
+                        `https://placehold.co/200x200?text=${encodeURIComponent(category.name)}`
+                      })`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       borderRadius: "10px",

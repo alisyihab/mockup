@@ -30,75 +30,64 @@ import frontCommonStyles from "@views/front-pages/styles.module.css";
 // Data
 const data = [
   {
-    desc: "I've never used a theme as versatile and flexible as Vuexy. It's my go to for building dashboard sites on almost any project.",
     svg: <Eckerd color="#2882C3" />,
-    rating: 5,
     name: "Eugenia Moore",
     position: "Founder of Hubspot",
+    followers: 14274,
   },
   {
-    desc: "Materio is awesome, and I particularly enjoy knowing that if I get stuck on something.",
     svg: <Levis color="#A8112E" />,
-    rating: 5,
     name: "Tommy haffman",
     position: "Founder of Levis",
+    followers: 1984,
   },
   {
-    desc: "This template is superior in so many ways. The code, the design, the regular updates, the support.. It's the whole package. Excellent Work.",
     svg: <Airbnb color="#FF5A60" />,
-    rating: 4,
     name: "Eugenia Moore",
     position: "CTO of Airbnb",
+    followers: 18886,
   },
   {
-    desc: "All the requirements for developers have been taken into consideration, so I'm able to build any interface I want.",
     svg: <Continental color="#F39409" />,
-    rating: 5,
     name: "Sara Smith",
     position: "Founder of Continental",
+    followers: 530,
   },
   {
-    desc: "I've never used a theme as versatile and flexible as Vuexy. It's my go to for building dashboard sites on almost any project.",
     svg: <Dribbble color="#ea4c89" />,
-    rating: 5,
     name: "Tommy haffman",
     position: "Founder of Hubspot",
+    followers: 2085,
   },
   {
-    desc: "I've never used a theme as versatile and flexible as Vuexy. It's my go to for building dashboard sites on almost any project.",
     svg: <Eckerd color="#2882C3" />,
-    rating: 5,
     name: "Eugenia Moore",
     position: "Founder of Hubspot",
-    color: "#2882C3",
+    followers: 14274,
   },
   {
-    desc: "Materio is awesome, and I particularly enjoy knowing that if I get stuck on something.",
     svg: <Levis color="#A8112E" />,
-    rating: 5,
     name: "Tommy haffman",
     position: "Founder of Levis",
+    followers: 1984,
   },
   {
-    desc: "This template is superior in so many ways. The code, the design, the regular updates, the support.. It's the whole package. Excellent Work.",
     svg: <Airbnb color="#FF5A60" />,
-    rating: 4,
     name: "Eugenia Moore",
     position: "CTO of Airbnb",
+    followers: 18886,
   },
   {
-    desc: "All the requirements for developers have been taken into consideration, so I'm able to build any interface I want.",
     svg: <Continental color="#F39409" />,
-    rating: 5,
     name: "Sara Smith",
     position: "Founder of Continental",
+    followers: 530,
   },
   {
-    desc: "Materio is awesome, and I particularly enjoy knowing that if I get stuck on something.",
     svg: <Dribbble color="#ea4c89" />,
-    rating: 5,
     name: "Tommy haffman",
     position: "Founder of Levis",
+    followers: 2085,
   },
 ];
 
@@ -190,67 +179,100 @@ const CustomerReviews = () => {
           <>
             <div ref={sliderRef} className="keen-slider mbe-6">
               {data.map((item, index) => (
-                <div key={index} className="keen-slider__slide flex p-6 sm:p-4">
+                <div
+                  key={index}
+                  className="keen-slider__slide flex p-6 sm:p-4"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                  }}
+                >
                   <Card
                     elevation={8}
-                    className="flex items-center justify-center"
+                    className="flex items-center"
                     style={{
-                      ...scaleStyle(index),
-                      width: "150px", // Circle size
-                      height: "150px",
-                      borderRadius: "50%",
+                      width: "200px", // Ukuran kartu
+                      height: "auto", // Biarkan tinggi menyesuaikan
+                      borderRadius: "12px",
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      overflow: "hidden", // Ensures content stays inside circle
-                      textAlign: "center",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <CardContent
-                      className="flex items-center justify-center"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: "0", // Remove padding for better centering
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    >
-                      <div
-                        className="flex items-center justify-center"
-                        style={{
-                          textAlign: "center",
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      >
+                    <CardContent className="p-8 items-center">
+                      <div className="flex flex-col gap-4 items-center text-center">
                         {item.svg}
+                        <Typography
+                          color="text.primary"
+                          variant="body1"
+                          className="font-medium"
+                        >
+                          {item.name}
+                        </Typography>
+                        <Typography
+                          color="text.secondary"
+                          variant="body2"
+                          style={{ marginBottom: "8px" }}
+                        >
+                          {item.followers} followers
+                        </Typography>
+                        <button
+                          style={{
+                            backgroundColor: "#6200ea", // Warna tombol
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "20px",
+                            padding: "8px 16px",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                          }}
+                        >
+                          Follow
+                        </button>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
               ))}
-            </div>
-            {loaded && instanceRef.current && (
-              <div className="swiper-dots">
-                {[
-                  ...Array(
-                    instanceRef.current.track.details.slides.length,
-                  ).keys(),
-                ].map((idx) => {
-                  return (
+              {loaded && instanceRef.current && (
+                <div
+                  className="swiper-dots"
+                  style={{
+                    position: "absolute",
+                    bottom: "-20px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    display: "flex",
+                    gap: "8px",
+                  }}
+                >
+                  {[
+                    ...Array(
+                      instanceRef.current.track.details.slides.length,
+                    ).keys(),
+                  ].map((idx) => (
                     <Badge
                       key={idx}
                       variant="dot"
                       component="div"
                       className={classnames({ active: currentSlide === idx })}
                       onClick={() => instanceRef.current?.moveToIdx(idx)}
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                        backgroundColor:
+                          currentSlide === idx ? "#1976d2" : "#ccc",
+                        borderRadius: "50%",
+                        cursor: "pointer",
+                      }}
                     />
-                  );
-                })}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         </AppKeenSlider>
       </div>
