@@ -33,45 +33,47 @@ interface StickyAppBarProps {
   isCartPage: boolean;
 }
 
-const StickyAppBar = styled(AppBar)<StickyAppBarProps>(
-  ({ isSticky, isCartPage }) => ({
-    position: isSticky ? "fixed" : "absolute",
-    top: isCartPage ? 0 : isSticky ? 0 : "20px",
-    backgroundColor: isCartPage
-      ? "rgb(255, 255, 255)"
-      : isSticky
-        ? "rgba(255, 255, 255)"
-        : "transparent",
-    boxShadow:
-      isSticky || isCartPage ? "0px 4px 6px rgba(0, 0, 0, 0.1)" : "none",
-    zIndex: 12,
-    padding: "0 20px",
-    animation:
-      isSticky && !isCartPage ? `${bounceAnimation} 0.5s ease` : "none",
-    transition: "all 0.3s ease-in-out",
-  }),
-);
+const StickyAppBar = styled(AppBar, {
+  shouldForwardProp: (prop) => prop !== "isSticky" && prop !== "isCartPage",
+})<StickyAppBarProps>(({ isSticky, isCartPage }) => ({
+  position: isSticky ? "fixed" : "absolute",
+  top: isCartPage ? 0 : isSticky ? 0 : "20px",
+  backgroundColor: isCartPage
+    ? "rgb(255, 255, 255)"
+    : isSticky
+      ? "rgba(255, 255, 255)"
+      : "transparent",
+  boxShadow: isSticky || isCartPage ? "0px 4px 6px rgba(0, 0, 0, 0.1)" : "none",
+  zIndex: 12,
+  padding: "0 20px",
+  animation: isSticky && !isCartPage ? `${bounceAnimation} 0.5s ease` : "none",
+  transition: "all 0.3s ease-in-out",
+}));
 
 const NavCustom = ({ currentPath }: { currentPath: string }) => {
   const [isSticky, setIsSticky] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isCartPage =
     currentPath === "/checkout" ||
     currentPath === "/payment-success" ||
-    currentPath == "/explore";
-
-  const isMobile = useMediaQuery((theme: Theme) =>
-    theme.breakpoints.down("md"),
-  );
+    currentPath === "/explore";
 
   useEffect(() => {
     const handleScroll = () => {
       setIsSticky(window.scrollY > 50);
     };
-
     window.addEventListener("scroll", handleScroll);
+
+    const mediaQuery = window.matchMedia("(max-width: 960px)");
+    setIsMobile(mediaQuery.matches);
+
+    const handleResize = () => setIsMobile(mediaQuery.matches);
+    window.addEventListener("resize", handleResize);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 

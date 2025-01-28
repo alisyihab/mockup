@@ -34,10 +34,14 @@ export default function TicketBooking({ cart }: TicketBookingProps) {
   };
 
   const handleScroll = () => {
-    setIsSticky(window.scrollY > 150);
+    if (typeof window !== "undefined") {
+      setIsSticky(window.scrollY > 150);
+    }
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
