@@ -77,6 +77,43 @@ const PopularByCountry = () => {
     );
   }
 
+  if (events.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "300px",
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          style={{ width: 80, height: 80, color: "#ccc" }}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 20.25c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9.75 9.75l4.5 4.5M14.25 9.75l-4.5 4.5"
+          />
+        </svg>
+        <Typography variant="h6" sx={{ color: "#aaa", marginTop: 2 }}>
+          No Events Available
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <section className="plb-[20px] bg-backgroundPaper">
       <div className={frontCommonStyles.layoutSpacing}>
@@ -148,7 +185,8 @@ const PopularByCountry = () => {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
-                    })} {" - "}
+                    })}{" "}
+                    {" - "}
                     {new Date(event.end_date).toLocaleDateString("en-US", {
                       day: "numeric",
                       month: "short",

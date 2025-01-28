@@ -37,13 +37,6 @@ const Layout = ({ children }: ChildrenType) => {
 
   return (
     <html id="__next">
-      <head>
-         <script
-          src="https://app.sandbox.midtrans.com/snap/snap.js"
-          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
-          async
-        ></script>
-      </head>
       <body className="flex is-full min-bs-full flex-auto flex-col">
         <Providers direction="ltr">
           <BlankLayout systemMode={systemMode}>
